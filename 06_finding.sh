@@ -5,4 +5,7 @@ if [[ -x `which mdfind` ]]; then
 	function mdloc () {
 	  mdfind "kMDItemFSName == '$*'wc"
 	}
+	function mdgrep () {
+		grep '$*' `mdhere $* | xargs`
+	}
 fi

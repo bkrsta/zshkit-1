@@ -1,9 +1,11 @@
 if [[ $SHLVL < 3 ]]; then
-  zshkitdir=`dirname $0`
-  
-  source $zshkitdir/rc
+
+	zshkitdir=`dirname $0`
+
+	source $zshkitdir/rc
 
 	for f in $zshkitdir/??_*; do
 		source $f
 	done
+
 fi
