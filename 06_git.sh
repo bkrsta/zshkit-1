@@ -5,7 +5,11 @@ if [[ -x `which git` ]]; then
 	alias gst='git status'
 
 	function git-branch-name () {
-		git branch 2> /dev/null | grep '^\*' | sed 's/^\*\ //'
+		gstatus=$(git status 2> /dev/null)
+		dirty=$(echo $gstatus | sed 's/^#.*$//' | tail -2 | grep 'nothing to commit (working directory clean)'; echo $?)
+		if [[ $dirty = 1 ]]; then
+			echo "1"
+		fi
 	}
 	function git-dirty () {
 		git status 2> /dev/null | grep "nothing to commit (working directory clean)"
