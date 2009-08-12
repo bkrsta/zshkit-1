@@ -1,19 +1,20 @@
 if [[ -x `which git` ]]; then
-
-	alias g=git
-	alias gdf='git diff'
-	alias gst='git status'
-
+	git_enable=1
 	function git-branch-name () {
-		gstatus=$(git status 2> /dev/null)
-		dirty=$(echo $gstatus | sed 's/^#.*$//' | tail -2 | grep 'nothing to commit (working directory clean)'; echo $?)
-		if [[ $dirty = 1 ]]; then
-			echo "1"
-		fi
+		git branch 2> /dev/null | grep '^\*' | sed 's/^\*\ //'
 	}
+  # Return 1 if repository is dirty. 0 if it isn't a repostory, or is clean.
 	function git-dirty () {
-		git status 2> /dev/null | grep "nothing to commit (working directory clean)"
-		echo $?
+	  local code
+		gs=$(git status 2> /dev/null)
+		if [[ $? == 128 ]];
+		then
+		  code=0
+	  else
+		 echo $gs | grep "nothing to commit (working directory clean)" | 2>&1 > /dev/null
+		 code=$?
+	 fi
+		echo $code
 	}
 	function gsrb () {
 		branch=$(git-branch-name) 
@@ -22,6 +23,38 @@ if [[ -x `which git` ]]; then
 		git checkout "${branch}"
 		git rebase master
 	}
+	
+	function git-toggle() {
+		if [[ $git_enable = 1 ]]; then
+			git_enable=0
+		else
+			git_enable=1
+		fi
+	}
+	
+  function git-prompt-l() {
+    emulate -L zsh
+    dirty_color=$fg[cyan]
+    branch=$(echo $gstatus | head -n 1 | sed 's/^# On branch //')
+    if [[ $branch == '# Not currently on any branch.' ]]; then
+      no_branch=1
+      branch='none'
+          fi
+    if [[ $git_enable = 1 ]]; then
+      gstatus=$(git status 2> /dev/null)
+      branch=$(echo $gstatus | head -n 1 | sed 's/^# On branch //')
+      dirty=$(echo $gstatus | sed 's/^#.*$//' | tail -n 2 | grep 'nothing to commit (working directory clean)'; echo $?)
+      if [[ x$branch != x ]]; then
+        if [[ $dirty = 1 ]] { dirty_color=$fg[magenta] }
+                  if [[ $no_branch = 1 ]] { dirty_color=$fg[red] }
+        [ x$branch != x ] && echo "%{$dirty_color%}$branch%{$reset_color%} "
+      fi
+    else
+      echo "%{$dirty_color%}!%{$reset_color%}"
+    fi
+  }
+
+
 	function git-prompt() {
 		gstatus=$(git status 2> /dev/null)
 		branch=$(echo $gstatus | head -1 | sed 's/^# On branch //')
@@ -44,6 +77,9 @@ if [[ -x `which git` ]]; then
 		ref=$(git-symbolic-ref HEAD 2> /dev/null) || return
 		echo " %{$fg[cyan]%}${ref#refs/heads/}%{$reset_color%}"
 	}
+	
+	
+	
 	
 	function git-scoreboard () {
 		git log | grep Author | sort | uniq -ci | sort -r
@@ -71,4 +107,23 @@ if [[ -x `which git` ]]; then
 	function nhgk () {
 		nohup gitk --all &
 	}
+
+  alias g='git'
+  alias gb='git branch -a -v'
+  alias gs='git status'
+  alias gd='git diff'
+  alias gf='git fetch'
+  alias gr='git-rebase'
+  alias gsc='git-svn dcommit'
+  alias gsr='git-svn rebase'
+  alias gsf='git-svn fetch'
+  # gc      => git checkout master
+  # gc bugs => git checkout bugs
+  function gc {
+  if [ -z "$1" ]; then
+    git checkout master
+    else
+    git checkout $1
+  fi
+  }
 fi

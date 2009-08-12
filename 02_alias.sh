@@ -6,6 +6,9 @@ alias gitnub="/Applications/GitNub.app/Contents/MacOS/GitNub"
 alias gitx="/Applications/GitX.app/Contents/Resources/gitx"
 alias gcola="/Applications/git-cola.app/Contents/MacOS/git-cola"
 
+alias hibernateon="sudo pmset -a hibernatemode 5"
+alias hibernateoff="sudo pmset -a hibernatemode 0"
+
 #export GIT_EDITOR="mate -w"
 
 # cd

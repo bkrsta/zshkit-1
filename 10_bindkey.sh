@@ -1,6 +1,6 @@
 bindkey -v
-bindkey "${key[Home]}" beginning-of-line
-bindkey "${key[End]}" end-of-line
+# bindkey "${key[Home]}" beginning-of-line
+# bindkey "${key[End]}" end-of-line
 # We always want a few of the EMACs-style maps
 bindkey "^A" beginning-of-line
 bindkey "^E" end-of-line
